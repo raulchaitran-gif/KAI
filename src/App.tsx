@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useStore } from './store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
 import Onboarding from './screens/Onboarding';
@@ -50,13 +50,13 @@ export default function App() {
       {/* FAB */}
       <button 
         onClick={() => setIsAddSheetOpen(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-accent text-bg-primary font-bold rounded-2xl shadow-[0_8px_24px_rgba(137,233,0,0.4)] flex items-center justify-center z-40 active:scale-90 transition-transform"
+        className="fixed bottom-20 right-6 w-14 h-14 bg-accent text-bg-primary font-bold rounded-2xl shadow-[0_8px_24px_rgba(137,233,0,0.4)] flex items-center justify-center z-40 active:scale-90 transition-transform"
       >
         <Plus size={32} className="stroke-[3]" />
       </button>
 
       {/* Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-bg-deep border-t border-divider px-6 pt-4 pb-8 flex justify-around items-center z-40 rounded-t-[32px] shadow-[0_-4px_12px_rgba(0,0,0,0.4)]">
+      <nav className="fixed bottom-0 left-0 right-0 bg-bg-deep border-t border-divider px-6 pt-3 pb-5 flex justify-around items-center z-40 rounded-t-[24px] shadow-[0_-4px_12px_rgba(0,0,0,0.4)]">
         <NavItem 
           active={activeTab === 'accounts'} 
           onClick={() => setActiveTab('accounts')} 

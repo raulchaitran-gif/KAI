@@ -16,6 +16,7 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
   const [categoryId, setCategoryId] = useState('food');
   const [customCategoryName, setCustomCategoryName] = useState('');
   const [accountId, setAccountId] = useState(accounts[0]?.id || '');
+  const [note, setNote] = useState('');
 
   const handleSave = () => {
     addTransaction({

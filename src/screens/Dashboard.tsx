@@ -28,7 +28,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="flex flex-col gap-8 pb-32">
+    <div className="flex flex-col gap-8 pb-24">
       {/* Header */}
       <header className="flex justify-between items-end bg-bg-primary/80 backdrop-blur-lg sticky top-0 p-4 -mx-4 z-40 border-b border-divider">
         <div>
