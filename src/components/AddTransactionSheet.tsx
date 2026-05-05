@@ -17,6 +17,8 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
   const [customCategoryName, setCustomCategoryName] = useState('');
   const [accountId, setAccountId] = useState(accounts[0]?.id || '');
   const [note, setNote] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [frequency, setFrequency] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
 
   const handleSave = () => {
     addTransaction({
@@ -26,7 +28,8 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
       accountId,
       note,
       date: new Date().toISOString(),
-      isRecurring: false
+      isRecurring,
+      frequency: isRecurring ? frequency : undefined
     });
     onClose();
   };
@@ -40,9 +43,15 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
       case 'shop': return <ShoppingBag size={24} />;
       case 'transport': return <Car size={24} />;
       case 'fun': return <Film size={24} />;
+      case 'salary': return <Zap size={24} />;
+      case 'bonus': return <Zap size={24} />;
       default: return <Zap size={24} />;
     }
   };
+
+  const incomeCategories = categories.filter(c => ['salary', 'bonus', 'other'].includes(c.id));
+  const expenseCategories = categories.filter(c => !['salary', 'bonus'].includes(c.id));
+  const filteredCategories = type === 'credit' ? incomeCategories : expenseCategories;
 
   return (
     <motion.div 
@@ -50,30 +59,32 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed inset-x-0 bottom-0 z-50 bg-bg-deep rounded-t-[32px] shadow-[0_-8px_30px_rgba(0,0,0,0.6)] flex flex-col max-h-[90vh] overflow-hidden"
+      className="fixed inset-x-0 bottom-0 z-50 bg-bg-deep rounded-t-[32px] shadow-[0_-8px_30px_rgba(0,0,0,0.6)] flex flex-col max-h-[90vh] overflow-hidden no-scrollbar"
     >
       <div className="w-full flex justify-center py-4">
         <div className="w-12 h-1.5 bg-bg-surface rounded-full" />
       </div>
 
-      <div className="px-6 pb-6">
-        <div className="flex justify-between items-center mb-8">
-           <button onClick={onClose} className="p-2 text-text-secondary hover:text-text-primary"><X size={24} /></button>
-           <div className="flex bg-black p-1 rounded-full border border-divider">
-              <button 
-                onClick={() => setType('debit')}
-                className={cn("px-6 py-2 rounded-full text-xs font-bold transition-all", type === 'debit' ? "bg-accent text-bg-deep" : "text-text-secondary")}
-              >Expense</button>
-              <button 
-                onClick={() => setType('credit')}
-                className={cn("px-6 py-2 rounded-full text-xs font-bold transition-all", type === 'credit' ? "bg-accent text-bg-deep" : "text-text-secondary")}
-              >Income</button>
-           </div>
-           <div className="w-10" />
-        </div>
+      <div className="px-6 pb-6 no-scrollbar">
+         <header className="flex justify-between items-center mb-6">
+            <button onClick={onClose} className="p-2 text-text-secondary hover:text-text-primary active:scale-90 transition-transform"><X size={24} /></button>
+            <div className="flex bg-bg-surface p-1 rounded-full border border-divider shadow-inner">
+               <button 
+                 onClick={() => { setType('debit'); setCategoryId('food'); }}
+                 className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", type === 'debit' ? "bg-accent text-bg-deep shadow-lg" : "text-text-secondary")}
+               >Debit</button>
+               <button 
+                 onClick={() => { setType('credit'); setCategoryId('salary'); }}
+                 className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", type === 'credit' ? "bg-accent text-bg-deep shadow-lg" : "text-text-secondary")}
+               >Credit</button>
+            </div>
+            <div className="w-10 flex justify-center">
+               <img src="https://lh3.googleusercontent.com/aida/ADBb0uhGkRcEEwLLuAMB0JF_KcXrKA6Zv6_plY6mnFLVwkGwHoZ6wkK6RZdH0zdCsiGaahWTPMtGB-8mRKwyYh-53UBKBnqmp6rvjClr81ytR59PxhrParyqH6O3xYQYOmW4EqRmMvBJvWn8uG45E1hgea7brYekEGZ3jrEFr3Pjzr8_-i_idjooU6EQNt5LF7Q1Ymd_rz2FlkoI128eAEaYE9KYr80l6wETsXmfa8L9okjZU4JdO4-tNpQDRUnvx5VDTQUcOQLGTlQDoL0" alt="KAI" className="w-8 h-8 rounded-lg" />
+            </div>
+         </header>
 
         <div className="flex flex-col items-center py-4">
-           <p className="text-[10px] font-bold text-text-secondary tracking-widest uppercase mb-1">Enter Amount</p>
+           <p className="text-[10px] font-bold text-text-secondary tracking-widest uppercase mb-1">Enter Volume</p>
            <div className="flex items-baseline gap-2">
              <span className="text-3xl font-bold text-accent">$</span>
              <input 
@@ -82,31 +93,31 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
                placeholder="0.00"
                value={amount}
                onChange={(e) => setAmount(e.target.value)}
-               className="bg-transparent border-none text-center text-5xl font-bold w-full max-w-[200px] focus:ring-0 placeholder:text-bg-surface"
+               className="bg-transparent border-none text-center text-5xl font-black w-full max-w-[220px] focus:ring-0 placeholder:text-bg-surface text-white"
              />
            </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 space-y-8 no-scrollbar">
-         <section>
+      <div className="flex-1 overflow-y-auto px-6 space-y-8 no-scrollbar scroll-smooth">
+         <section shadow-sm>
             <div className="flex justify-between items-center mb-4">
-               <h6 className="text-[10px] font-bold text-text-secondary tracking-widest uppercase">Select Category</h6>
+               <h6 className="text-[10px] font-bold text-text-secondary tracking-widest uppercase">Purpose / Category</h6>
             </div>
             <div className="grid grid-cols-4 gap-4">
-               {categories.map(cat => (
+               {filteredCategories.map(cat => (
                  <button 
                    key={cat.id}
                    onClick={() => setCategoryId(cat.id)}
-                   className="flex flex-col items-center gap-2"
+                   className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
                  >
                     <div className={cn(
                       "w-14 h-14 rounded-2xl border flex items-center justify-center transition-all",
-                      categoryId === cat.id ? "border-accent bg-accent/10 text-accent" : "border-divider text-text-secondary"
+                      categoryId === cat.id ? "border-accent bg-accent/10 text-accent shadow-lg" : "border-divider text-text-secondary bg-bg-surface/30"
                     )}>
                        {getCatIcon(cat.id)}
                     </div>
-                    <span className={cn("text-[10px] font-bold uppercase", categoryId === cat.id ? "text-accent" : "text-text-secondary")}>{cat.name}</span>
+                    <span className={cn("text-[8px] font-bold uppercase tracking-tighter", categoryId === cat.id ? "text-accent" : "text-text-secondary")}>{cat.name}</span>
                  </button>
                ))}
             </div>
@@ -160,6 +171,51 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
                    <Clock size={16} className="text-text-secondary" /> {format(new Date(), 'HH:mm a')}
                 </div>
             </div>
+         </section>
+
+         <section className="bg-bg-surface/50 p-4 rounded-[24px] border border-divider shadow-inner">
+            <div className="flex justify-between items-center">
+               <div className="flex items-center gap-3">
+                  <div className={cn("p-2 rounded-xl transition-colors", isRecurring ? "bg-accent text-bg-deep" : "bg-bg-deep text-text-secondary")}>
+                     <Clock size={18} />
+                  </div>
+                  <div>
+                     <p className="text-[10px] font-black tracking-widest uppercase text-white">RECURRING PAYMENT</p>
+                     <p className="text-[8px] font-bold text-text-secondary uppercase">Set it and forget it</p>
+                  </div>
+               </div>
+               <button 
+                 onClick={() => setIsRecurring(!isRecurring)}
+                 className={cn("w-12 h-6 rounded-full relative p-1 transition-colors", isRecurring ? "bg-accent" : "bg-bg-deep")}
+               >
+                  <motion.div 
+                    animate={{ x: isRecurring ? 24 : 0 }}
+                    transition={{ type: 'spring', damping: 15, stiffness: 200 }}
+                    className="w-4 h-4 bg-white rounded-full shadow-md"
+                  />
+               </button>
+            </div>
+
+            {isRecurring && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="pt-4 mt-4 border-t border-divider grid grid-cols-3 gap-2"
+              >
+                 {['weekly', 'monthly', 'yearly'].map(freq => (
+                   <button 
+                     key={freq}
+                     onClick={() => setFrequency(freq as any)}
+                     className={cn(
+                       "py-2 rounded-xl border text-[8px] font-black uppercase tracking-tighter transition-all",
+                       frequency === freq ? "bg-accent text-bg-deep border-accent shadow-lg" : "bg-bg-deep text-text-secondary border-divider"
+                     )}
+                   >
+                      {freq}
+                   </button>
+                 ))}
+              </motion.div>
+            )}
          </section>
 
          <section className="pb-8">

@@ -4,19 +4,26 @@ import { motion, AnimatePresence } from 'motion/react';
 import Onboarding from './screens/Onboarding';
 import Dashboard from './screens/Dashboard';
 import Accounts from './screens/Accounts';
+import AccountDetail from './screens/AccountDetail';
 import Transactions from './screens/Transactions';
 import Settings from './screens/Settings';
 import AddTransactionSheet from './components/AddTransactionSheet';
+import TopBar from './components/TopBar';
 import { Landmark, LayoutDashboard, ReceiptText, Settings as SettingsIcon, Plus } from 'lucide-react';
 import { cn } from './lib/utils';
 import './i18n';
 
-type Tab = 'accounts' | 'dashboard' | 'transactions' | 'settings';
+type Tab = 'accounts' | 'dashboard' | 'transactions' | 'settings' | 'account-detail';
 
 export default function App() {
-  const { hasOnboarded } = useStore();
-  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const { hasOnboarded, processRecurringTransactions, activeTab, setActiveTab } = useStore();
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (hasOnboarded) {
+      processRecurringTransactions();
+    }
+  }, [hasOnboarded, processRecurringTransactions]);
 
   if (!hasOnboarded) {
     return <Onboarding />;
@@ -25,6 +32,7 @@ export default function App() {
   const renderScreen = () => {
     switch (activeTab) {
       case 'accounts': return <Accounts />;
+      case 'account-detail': return <AccountDetail />;
       case 'dashboard': return <Dashboard />;
       case 'transactions': return <Transactions />;
       case 'settings': return <Settings />;
@@ -32,8 +40,9 @@ export default function App() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-bg-primary text-text-primary px-4 selection:bg-accent selection:text-bg-deep">
-      <main className="pt-2">
+    <div className="max-w-md mx-auto min-h-screen bg-bg-primary text-text-primary px-4 selection:bg-accent selection:text-bg-deep overflow-x-hidden">
+      <TopBar />
+      <main className="pt-16 pb-20">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
