@@ -53,7 +53,7 @@ export default function Onboarding() {
             <div className="relative group">
               <div className="absolute inset-0 bg-accent/20 rounded-full blur-[80px]" />
               <img 
-                src="https://lh3.googleusercontent.com/aida/ADBb0uhGkRcEEwLLuAMB0JF_KcXrKA6Zv6_plY6mnFLVwkGwHoZ6wkK6RZdH0zdCsiGaahWTPMtGB-8mRKwyYh-53UBKBnqmp6rvjClr81ytR59PxhrParyqH6O3xYQYOmW4EqRmMvBJvWn8uG45E1hgea7brYekEGZ3jrEFr3Pjzr8_-i_idjooU6EQNt5LF7Q1Ymd_rz2FlkoI128eAEaYE9KYr80l6wETsXmfa8L9okjZU4JdO4-tNpQDRUnvx5VDTQUcOQLGTlQDoL0" 
+                src="/src/assets/logo.png" 
                 alt="KAI Logo"
                 className="w-48 h-48 relative z-10"
               />

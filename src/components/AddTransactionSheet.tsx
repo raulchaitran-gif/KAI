@@ -79,7 +79,7 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
                >Credit</button>
             </div>
             <div className="w-10 flex justify-center">
-               <img src="https://lh3.googleusercontent.com/aida/ADBb0uhGkRcEEwLLuAMB0JF_KcXrKA6Zv6_plY6mnFLVwkGwHoZ6wkK6RZdH0zdCsiGaahWTPMtGB-8mRKwyYh-53UBKBnqmp6rvjClr81ytR59PxhrParyqH6O3xYQYOmW4EqRmMvBJvWn8uG45E1hgea7brYekEGZ3jrEFr3Pjzr8_-i_idjooU6EQNt5LF7Q1Ymd_rz2FlkoI128eAEaYE9KYr80l6wETsXmfa8L9okjZU4JdO4-tNpQDRUnvx5VDTQUcOQLGTlQDoL0" alt="KAI" className="w-8 h-8 rounded-lg" />
+               <img src="/src/assets/logo.png" alt="KAI" className="w-8 h-8 rounded-lg" />
             </div>
          </header>
 
