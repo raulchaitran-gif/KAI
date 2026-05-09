@@ -67,6 +67,7 @@ interface KaiState {
   lastRecurringCheck?: string;
   
   // Actions
+  completeOnboarding: (userName: string, currency: string) => void;
   setActiveTab: (tab: 'accounts' | 'dashboard' | 'transactions' | 'settings' | 'account-detail') => void;
   setSelectedAccountId: (id: string | null) => void;
   addAccount: (account: Omit<Account, 'id'>) => void;

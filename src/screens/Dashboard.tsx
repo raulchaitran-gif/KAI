@@ -41,11 +41,18 @@ export default function Dashboard() {
     };
   }).reverse();
 
+  const [isAddingGoal, setIsAddingGoal] = useState(false);
+  const [goalName, setGoalName] = useState('');
+  const [goalTarget, setGoalTarget] = useState('');
+
   const handleAddGoal = () => {
-    const name = prompt('Goal name?');
-    const target = parseFloat(prompt('Target amount?') || '0');
+    const name = goalName.trim();
+    const target = parseFloat(goalTarget);
     if (name && target > 0) {
       addGoal({ name, targetAmount: target, currentAmount: 0, color: '#89E900' });
+      setGoalName('');
+      setGoalTarget('');
+      setIsAddingGoal(false);
     }
   };
 
@@ -218,12 +225,46 @@ export default function Dashboard() {
            <div className="flex justify-between items-center mb-6">
               <h2 className="text-text-secondary text-xs font-bold uppercase tracking-widest">Financial Goals</h2>
               <button 
-                onClick={handleAddGoal}
+                onClick={() => setIsAddingGoal(v => !v)}
                 className="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent active:scale-90 transition-transform"
               >
                  <Plus size={16} className="stroke-[3]" />
               </button>
            </div>
+
+           {isAddingGoal && (
+             <div className="mb-4 p-4 bg-bg-deep rounded-2xl border border-divider space-y-3">
+               <input
+                 type="text"
+                 placeholder="Goal name (e.g. Emergency Fund)"
+                 value={goalName}
+                 onChange={(e) => setGoalName(e.target.value)}
+                 className="w-full bg-black border border-divider p-3 rounded-xl focus:border-accent outline-none text-sm text-white"
+               />
+               <input
+                 type="number"
+                 placeholder="Target amount"
+                 value={goalTarget}
+                 onChange={(e) => setGoalTarget(e.target.value)}
+                 className="w-full bg-black border border-divider p-3 rounded-xl focus:border-accent outline-none text-sm text-white"
+               />
+               <div className="flex gap-2">
+                 <button
+                   onClick={handleAddGoal}
+                   className="flex-1 bg-accent text-bg-deep py-2 rounded-xl text-xs font-black uppercase tracking-widest active:scale-95 transition-transform"
+                 >
+                   Save Goal
+                 </button>
+                 <button
+                   onClick={() => { setIsAddingGoal(false); setGoalName(''); setGoalTarget(''); }}
+                   className="px-4 py-2 rounded-xl text-xs font-black uppercase text-text-secondary border border-divider active:scale-95 transition-transform"
+                 >
+                   Cancel
+                 </button>
+               </div>
+             </div>
+           )}
+
            <div className="space-y-4">
               {goals.length > 0 ? (
                 goals.map(goal => {
@@ -253,7 +294,7 @@ export default function Dashboard() {
               ) : (
                 <div className="text-center py-6 border-2 border-dashed border-divider rounded-2xl">
                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-2">No Goals Set</p>
-                   <button onClick={handleAddGoal} className="text-accent text-[10px] font-black underline">CREATE FIRST GOAL</button>
+                   <button onClick={() => setIsAddingGoal(true)} className="text-accent text-[10px] font-black underline">CREATE FIRST GOAL</button>
                 </div>
               )}
            </div>

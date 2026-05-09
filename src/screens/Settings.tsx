@@ -1,3 +1,4 @@
+import React from 'react';
 import { useStore } from '../store/useStore';
 import { Bell, Moon, Lock, Settings as SettingsIcon, ChevronRight, FileText, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';

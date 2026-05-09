@@ -100,7 +100,7 @@ export default function AddTransactionSheet({ onClose }: AddTransactionSheetProp
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 space-y-8 no-scrollbar scroll-smooth">
-         <section shadow-sm>
+         <section className="shadow-sm">
             <div className="flex justify-between items-center mb-4">
                <h6 className="text-[10px] font-bold text-text-secondary tracking-widest uppercase">Purpose / Category</h6>
             </div>

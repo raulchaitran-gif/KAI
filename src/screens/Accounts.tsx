@@ -25,6 +25,10 @@ export default function Accounts() {
   const currency = settings.currency;
   
   const totalBalance = accounts.reduce((acc, curr) => acc + curr.balance, 0);
+  const cashFlowAccounts = accounts.filter(a => a.type === 'bank' || a.type === 'cash');
+  const savingsAccounts = accounts.filter(a => a.type === 'savings' || a.type === 'investment');
+  const cashFlowTotal = cashFlowAccounts.reduce((acc, curr) => acc + curr.balance, 0);
+  const savingsTotal = savingsAccounts.reduce((acc, curr) => acc + curr.balance, 0);
 
   const handleAccountClick = (id: string) => {
     setSelectedAccountId(id);
@@ -107,7 +111,7 @@ export default function Accounts() {
           </div>
           <div>
             <p className="text-[11px] font-black text-white/20 uppercase tracking-widest mb-1">Cash Flow</p>
-            <p className="text-2xl font-black text-white tracking-tighter">$12,840</p>
+            <p className="text-2xl font-black text-white tracking-tighter">{formatCurrency(cashFlowTotal, currency)}</p>
           </div>
         </div>
 
@@ -120,7 +124,7 @@ export default function Accounts() {
           </div>
           <div>
             <p className="text-[11px] font-black text-white/20 uppercase tracking-widest mb-1">Savings</p>
-            <p className="text-2xl font-black text-white tracking-tighter">$111,752</p>
+            <p className="text-2xl font-black text-white tracking-tighter">{formatCurrency(savingsTotal, currency)}</p>
           </div>
         </div>
       </div>

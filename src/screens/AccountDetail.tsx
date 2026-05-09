@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { 
   ArrowLeft, 
@@ -31,6 +31,7 @@ export default function AccountDetail() {
   const currency = settings.currency;
 
   const account = accounts.find(a => a.id === selectedAccountId);
+  const [searchQuery, setSearchQuery] = useState('');
   
   if (!account) {
     return (
@@ -46,7 +47,15 @@ export default function AccountDetail() {
     );
   }
 
-  const accountTransactions = transactions.filter(t => t.accountId === account.id);
+  const accountTransactions = transactions
+    .filter(t => t.accountId === account.id)
+    .filter(t => {
+      if (!searchQuery) return true;
+      return (
+        t.note?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        t.categoryId.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    });
 
   const getAccountIcon = (type: string, name: string) => {
     if (name.includes('Growth')) return <Rocket />;
@@ -60,6 +69,10 @@ export default function AccountDetail() {
   };
 
   const [wholePart, decimalPart] = formatCurrency(account.balance, currency).split('.');
+
+  const allAccountTransactions = transactions.filter(t => t.accountId === account.id);
+  const totalInflow = allAccountTransactions.filter(t => t.type === 'credit').reduce((acc, t) => acc + t.amount, 0);
+  const totalOutflow = allAccountTransactions.filter(t => t.type === 'debit').reduce((acc, t) => acc + t.amount, 0);
 
   return (
     <div className="flex flex-col gap-6 pb-24 no-scrollbar">
@@ -104,14 +117,14 @@ export default function AccountDetail() {
               <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Inflow</span>
               <div className="flex items-center gap-1.5 text-accent">
                 <TrendingUp size={12} className="stroke-[3]" />
-                <span className="text-sm font-black">$4,250</span>
+                <span className="text-sm font-black">{formatCurrency(totalInflow, currency)}</span>
               </div>
            </div>
            <div className="bg-[#262626] p-4 rounded-2xl border border-white/5 flex flex-col gap-1 items-center">
               <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Outflow</span>
               <div className="flex items-center gap-1.5 text-orange-400">
                 <TrendingDown size={12} className="stroke-[3]" />
-                <span className="text-sm font-black">$2,110</span>
+                <span className="text-sm font-black">{formatCurrency(totalOutflow, currency)}</span>
               </div>
            </div>
         </div>
@@ -125,6 +138,8 @@ export default function AccountDetail() {
         <input 
           type="text" 
           placeholder="Search transactions..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full bg-[#1A1A1A] border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold placeholder:text-white/10 focus:outline-none focus:border-accent/40 transition-all shadow-xl"
         />
       </div>
