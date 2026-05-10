@@ -16,6 +16,7 @@ import {
   checkBudgetAlerts,
   sendDailyTip,
   sendWelcomeNotification,
+  restoreReminder,
 } from './lib/notifications';
 import './i18n';
 
@@ -32,6 +33,7 @@ export default function App() {
       requestNotificationPermission().then(granted => {
         if (!granted) return;
         sendDailyTip();
+        restoreReminder();
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const budgetAlerts = categories

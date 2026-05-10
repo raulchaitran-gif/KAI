@@ -117,3 +117,67 @@ export async function sendDailyTip(): Promise<void> {
   const tip = TIPS[Math.floor(Math.random() * TIPS.length)];
   await sendNotification({ title: '💡 Daily Money Tip', body: tip });
 }
+
+// ── Transaction Reminder ──────────────────────────────────────────────────────
+
+const REMINDER_TIME_KEY = 'kai-reminder-time';      // e.g. "20:00"
+const REMINDER_TIMER_KEY = 'kai-reminder-timer-id'; // setTimeout id (as string)
+
+const REMINDER_MESSAGES = [
+  "Don't forget to log today's expenses in KAI! 💸",
+  "Quick check — did you record all your transactions today? 📋",
+  "Keep your finances accurate — log today's spending now! ✅",
+  "Your money tracker is waiting! Add today's transactions. 💰",
+  "Stay on top of your budget — log any new expenses today. 📊",
+];
+
+export function getReminderTime(): string | null {
+  return localStorage.getItem(REMINDER_TIME_KEY);
+}
+
+export function setReminderTime(time: string | null): void {
+  // Clear any existing scheduled reminder
+  const existingId = localStorage.getItem(REMINDER_TIMER_KEY);
+  if (existingId) clearTimeout(Number(existingId));
+  localStorage.removeItem(REMINDER_TIMER_KEY);
+
+  if (!time) {
+    localStorage.removeItem(REMINDER_TIME_KEY);
+    return;
+  }
+
+  localStorage.setItem(REMINDER_TIME_KEY, time);
+  scheduleNextReminder(time);
+}
+
+function scheduleNextReminder(time: string): void {
+  const [hours, minutes] = time.split(':').map(Number);
+  const now = new Date();
+  const next = new Date();
+  next.setHours(hours, minutes, 0, 0);
+
+  // If the time has already passed today, schedule for tomorrow
+  if (next <= now) next.setDate(next.getDate() + 1);
+
+  const msUntil = next.getTime() - now.getTime();
+
+  const id = window.setTimeout(async () => {
+    const msg = REMINDER_MESSAGES[Math.floor(Math.random() * REMINDER_MESSAGES.length)];
+    await sendNotification({
+      title: '📝 Log Your Transactions',
+      body: msg,
+    });
+    // Reschedule for the next day
+    scheduleNextReminder(time);
+  }, msUntil);
+
+  localStorage.setItem(REMINDER_TIMER_KEY, String(id));
+}
+
+/**
+ * Call this on app load to re-arm the reminder if one was previously set.
+ */
+export function restoreReminder(): void {
+  const time = getReminderTime();
+  if (time) scheduleNextReminder(time);
+}

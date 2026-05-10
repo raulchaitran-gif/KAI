@@ -6,11 +6,14 @@ import { exportToPDF } from '../lib/exportPdf';
 import {
   requestNotificationPermission,
   getNotificationPermission,
+  getReminderTime,
+  setReminderTime,
 } from '../lib/notifications';
 
 export default function Settings() {
   const { clearData, settings, setCurrency, userName, transactions, accounts, goals, categories } = useStore();
   const [notifPermission, setNotifPermission] = useState<string>(getNotificationPermission());
+  const [reminderTime, setReminderTimeState] = useState<string>(getReminderTime() ?? '');
 
   useEffect(() => {
     setNotifPermission(getNotificationPermission());
@@ -64,6 +67,18 @@ export default function Settings() {
       return;
     }
     exportToPDF(userName, settings.currency, transactions, accounts, goals, categories);
+  };
+
+  const handleReminderChange = (time: string) => {
+    setReminderTimeState(time);
+    if (notifPermission !== 'granted') {
+      requestNotificationPermission().then(granted => {
+        setNotifPermission(granted ? 'granted' : 'denied');
+        if (granted) setReminderTime(time || null);
+      });
+    } else {
+      setReminderTime(time || null);
+    }
   };
 
   const togglePreference = (pref: string) => {
@@ -150,6 +165,40 @@ export default function Settings() {
                  : <ChevronRight className="text-text-secondary group-hover:text-accent transition-colors" size={20} />
                }
             </button>
+         </div>
+
+         {/* Transaction Reminder */}
+         <div className="bg-bg-surface rounded-2xl border border-divider overflow-hidden shadow-xl p-4 space-y-3">
+           <div className="flex items-center gap-3">
+             <div className="p-2 bg-bg-deep rounded-xl text-accent"><Bell size={18} /></div>
+             <div>
+               <p className="font-bold text-sm">Daily Transaction Reminder</p>
+               <p className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">
+                 {reminderTime ? `Reminds you at ${reminderTime} every day` : 'Set a time to log your expenses'}
+               </p>
+             </div>
+           </div>
+           <div className="flex items-center gap-3">
+             <input
+               type="time"
+               value={reminderTime}
+               onChange={(e) => handleReminderChange(e.target.value)}
+               className="flex-1 bg-bg-deep border border-divider rounded-xl px-4 py-3 text-sm font-bold text-white outline-none focus:border-accent transition-colors"
+             />
+             {reminderTime && (
+               <button
+                 onClick={() => handleReminderChange('')}
+                 className="px-4 py-3 bg-danger/10 border border-danger/30 text-danger rounded-xl text-xs font-black uppercase tracking-widest active:scale-95 transition-transform"
+               >
+                 Clear
+               </button>
+             )}
+           </div>
+           {reminderTime && (
+             <p className="text-[9px] text-accent font-bold uppercase tracking-widest px-1">
+               ✓ Reminder set — you'll be notified at {reminderTime} daily
+             </p>
+           )}
          </div>
       </section>
 
