@@ -11,19 +11,51 @@ import AddTransactionSheet from './components/AddTransactionSheet';
 import TopBar from './components/TopBar';
 import { Landmark, LayoutDashboard, ReceiptText, Settings as SettingsIcon, Plus } from 'lucide-react';
 import { cn } from './lib/utils';
+import {
+  requestNotificationPermission,
+  checkBudgetAlerts,
+  sendDailyTip,
+  sendWelcomeNotification,
+} from './lib/notifications';
 import './i18n';
 
 type Tab = 'accounts' | 'dashboard' | 'transactions' | 'settings' | 'account-detail';
 
 export default function App() {
-  const { hasOnboarded, processRecurringTransactions, activeTab, setActiveTab } = useStore();
+  const { hasOnboarded, processRecurringTransactions, activeTab, setActiveTab, userName, transactions, categories } = useStore();
   const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
 
   React.useEffect(() => {
     if (hasOnboarded) {
       processRecurringTransactions();
+
+      requestNotificationPermission().then(granted => {
+        if (!granted) return;
+        sendDailyTip();
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const budgetAlerts = categories
+          .filter(c => c.budgetLimit > 0)
+          .map(c => {
+            const spent = transactions
+              .filter(t => t.categoryId === c.id && t.type === 'debit' && new Date(t.date) >= monthStart)
+              .reduce((s, t) => s + t.amount, 0);
+            return { categoryName: c.name, spent, limit: c.budgetLimit };
+          });
+        checkBudgetAlerts(budgetAlerts);
+      });
     }
-  }, [hasOnboarded, processRecurringTransactions]);
+  }, [hasOnboarded]);
+
+  React.useEffect(() => {
+    if (hasOnboarded && userName) {
+      const welcomed = localStorage.getItem('kai-welcomed');
+      if (!welcomed) {
+        localStorage.setItem('kai-welcomed', 'true');
+        sendWelcomeNotification(userName);
+      }
+    }
+  }, [hasOnboarded, userName]);
 
   if (!hasOnboarded) {
     return <Onboarding />;

@@ -187,6 +187,14 @@ export const useStore = create<KaiState>()(
             accounts: updatedAccounts,
             lastRecurringCheck: now.toISOString()
           });
+          // Fire notification for recurring transactions (dynamic import to avoid SSR issues)
+          import('../lib/notifications').then(({ notifyRecurringProcessed }) => {
+            notifyRecurringProcessed(newTransactions.map(t => ({
+              note: t.note,
+              amount: t.amount,
+              currency: state.settings.currency,
+            })));
+          });
         } else {
           set({ lastRecurringCheck: now.toISOString() });
         }
